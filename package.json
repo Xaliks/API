@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "main": "app.js",
+  "main": "index.js",
   "dependencies": {
     "cheerio": "^1.0.0-rc.6",
     "express": "^4.17.1",
@@ -8,9 +8,6 @@
   },
   "version": "1.0.0",
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

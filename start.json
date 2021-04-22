@@ -1,8 +1,9 @@
 {
     "Author": "Xaliks#5991",
     "endpoints": [
-        "/random/animal/dog",
-        "/random/animal/cat",
-        "/random/animal/bird"
+        "/info/minecraft/player/:nickname",
+        "/info/minecraft/server/:server_ip",
+
+        "/animal/cat"
     ]
 }
