@@ -27,8 +27,30 @@ module.exports = {
             }
         }
         if (par === 'server') {
-            return {
-                "Hello!": ":)"
+            const server_ip = encodeURIComponent(other)
+            const data = await fetch(`https://api.mcsrvstat.us/2/${server_ip}`).then(resp => resp.json())
+            const data2 = await fetch(`https://mcapi.xdefcon.com/server/${server_ip}/full/json`).then(resp => resp.json())
+            if (data.ip === '127.0.0.1' && !data2.serverip && data2.serverStatus === 'offline') return {
+                "error": "Server Not Found!"
+            }
+
+            if (data2.serverStatus === 'online') return {
+                "status": data2.serverStatus,
+                "host": data.hostname,
+                "ip": data.ip,
+                "port": data.port,
+                "version": data.version,
+                "players": {
+                    "now": data.players.online,
+                    "max": data.players.max
+                },
+                "motd": data2.motd.text,
+                "icon": data2.icon
+            }
+            else return {
+                "status": data2.serverStatus,
+                "host": data.hostname,
+                "ip": data.ip,
             }
         }
     }
