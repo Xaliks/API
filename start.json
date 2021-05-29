@@ -1,9 +1,25 @@
 {
-    "Author": "Xaliks#5991",
-    "endpoints": [
-        "/info/minecraft/player/:nickname",
-        "/info/minecraft/server/:server_ip",
+  "Author": "Xaliks#5991",
+  "endpoints": [
+    "/info/minecraft/player/:nickname",
+    "/info/minecraft/server/:server_ip",
 
-        "/animal/cat"
-    ]
+    "/random/cat",
+    "/random/wyr"
+  ],
+  "used_apis": [
+    "http://either.io",
+
+    "https://nekos.life/",
+    "https://thatcopy.pw/",
+    "https://cataas.com/",
+    "https://api.thecatapi.com/",
+    "https://aws.random.cat/",
+    "https://some-random-api.ml/",
+    "https://shibe.online/",
+
+    "https://api.mcsrvstat.us/",
+    "https://mcapi.xdefcon.com/",
+    "https://visage.surgeplay.com/"
+  ]
 }

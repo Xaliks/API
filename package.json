@@ -2,6 +2,7 @@
   "name": "api",
   "main": "index.js",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.9",
     "express": "^4.17.1",
     "node-fetch": "^2.6.1"
   },
