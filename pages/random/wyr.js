@@ -6,7 +6,16 @@ module.exports = {
     const data = await fetch("http://either.io").then((resp) => resp.text());
     const $ = cheerio.load(data);
 
-    const wyr = String($('div[class="option"] a').text()).split("\n");
-    return [wyr[1].trim(), wyr[2].trim()];
+    const wyr = $('div[class="option"] a').text().split(" \n");
+    const votes = $('span[class="contents"]').text().split(" votes")[0];
+    const tag = $('ul[class="tags"] li a').text();
+    const author = $('span[id="question-author"] a').text()
+
+    return {
+      questions: [wyr[1], wyr[2]],
+      votes,
+      tag,
+      author
+    };
   },
 };
