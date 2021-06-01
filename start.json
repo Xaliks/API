@@ -3,6 +3,9 @@
   "endpoints": [
     "/info/minecraft/player/:nickname",
     "/info/minecraft/server/:server_ip",
+    "/info/spotify/track/:name",
+    "/info/spotify/album/:name",
+    "/info/spotify/artist/:name",
 
     "/random/cat",
     "/random/wyr"
@@ -20,6 +23,10 @@
 
     "https://api.mcsrvstat.us/",
     "https://mcapi.xdefcon.com/",
-    "https://visage.surgeplay.com/"
+    "https://visage.surgeplay.com/",
+
+    "https://cheerio.js.org",
+    "https://expressjs.com/",
+    "https://spotify-api.js.org"
   ]
 }
