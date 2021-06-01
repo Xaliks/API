@@ -7,7 +7,7 @@
     "node-fetch": "^2.6.1"
   },
   "scripts": {
-    "format": "prettier --write \"**/*.{js,json}\" --ignore-path functions/findMember.js"
+    "format": "prettier --write \"**/*.{js,json}\""
   },
   "version": "1.0.0",
   "devDependencies": {},

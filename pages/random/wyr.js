@@ -1,8 +1,9 @@
 const cheerio = require("cheerio");
+const fetch = require("node-fetch");
 
 module.exports = {
   name: "wyr",
-  async run(fetch) {
+  async run() {
     const data = await fetch("http://either.io").then((resp) => resp.text());
     const $ = cheerio.load(data);
 
@@ -16,6 +17,7 @@ module.exports = {
         'div[class="result result-2"] div[class="total-votes"] span[class="count"]'
       ).html(),
     ];
+    const total_votes = $('span[class="contents"]').text().split(" votes")[0];
     const description = $('p[class="more-info"]').text() || null;
     const author = $('span[id="question-author"] a').text();
     const tag = $('ul[class="tags"] li a').text();
@@ -24,6 +26,7 @@ module.exports = {
       title,
       questions: [wyr[1], wyr[2]],
       votes,
+      total_votes,
       description,
       author,
       tag,

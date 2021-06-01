@@ -1,9 +1,5 @@
 const { readdirSync } = require("fs");
 
-const random = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
 module.exports = (app, express) => {
   app.get("/", (req, resp) => {
     resp.send(require("../start.json"));
@@ -14,16 +10,15 @@ module.exports = (app, express) => {
       if (file === req.params.category) r = true;
     });
     if (r) {
-      require(`./${req.params.category}`)(app, check, getEndpoints, random);
+      require(`./${req.params.category}`)(app, check);
       return resp.send({
-        Author: "Xaliks#5991",
         endpoints: getEndpoints(req.params.category),
       });
     } else return resp.send(require("../start.json"));
   });
 
   readdirSync(`./pages/`).forEach((dir) => {
-    require(`./${dir}`)(app, check, getEndpoints, random);
+    require(`./${dir}`)(app, check);
   });
 
   app.listen(1001, (error) => {

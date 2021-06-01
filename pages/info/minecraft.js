@@ -1,8 +1,10 @@
+const fetch = require("node-fetch");
+
 module.exports = {
   name: "minecraft",
   firstEndpoints: ["/player/:nickname", "/server/:server_ip"],
   secondEndpoints: ["PLAYER: /:nickname", "SERVER: /:server_ip"],
-  async run(fetch, par, other) {
+  async run(par, other) {
     if (par === "player") {
       const username = encodeURIComponent(other);
       const data = await fetch(

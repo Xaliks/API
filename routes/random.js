@@ -1,18 +1,18 @@
-module.exports = (app, check, getEndpoints, random) => {
+module.exports = (app, check) => {
   app.get("/random/:query", async (req, resp) => {
     if (!check("random", req.params.query))
       return resp.send({
-        success: false,
         error: "Not Found!",
       });
 
     const data = await require(`../pages/random/${req.params.query}`).run(
-      require("node-fetch"),
       random
     );
-    resp.send({
-      success: true,
-      data,
-    });
+
+    resp.send(data);
   });
 };
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
