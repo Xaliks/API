@@ -1,156 +1,101 @@
-const Spotify = require("spotify-api.js");
-const client = new Spotify.Client();
+const fetch = require("node-fetch");
 
 module.exports = {
   name: "spotify",
   firstEndpoints: ["/artist/:name", "/track/:name", "/album/:name"],
   secondEndpoints: ["ARTIST: /:name", "TRACK: /:name", "ALBUM: /:name"],
   async run(par, other) {
-    await client.login(
-      process.env.SPOTIFY_CLIENT_ID,
-      process.env.SPOTIFY_CLIENT_SECRET
-    );
-
     if (par === "artist") {
-      const result = await client.artists.search(other);
-      if (!result.items[0]) return { error: "Artist not found!" };
-
-      let top10tracks = [];
-
-      await client.artists.getTopTracks(result.items[0].id).then((tracks) => {
-        tracks.forEach(async (track) => {
-          const {
-            id,
-            name,
-            externalUrls,
-            duration,
-            uri,
-            popularity,
-            previewUrl,
-          } = track;
-
-          top10tracks.push({
-            id,
-            name,
-            url: externalUrls.spotify,
-            uri,
-            preview: previewUrl,
-            duration,
-            popularity,
-          });
-        });
-      });
-
-      const {
-        id,
-        name,
-        externalUrls,
-        uri,
-        totalFollowers,
-        images,
-        popularity,
-      } = result.items[0];
+      const data = await search("artist", other);
+      if (!data) return { error: "Artist not found!" };
 
       return {
-        id,
-        name,
-        url: externalUrls.spotify,
-        uri,
-        followers: totalFollowers,
-        popularity,
-        images,
-        top10tracks,
-      };
+        id: data.id,
+        name: data.name,
+        uri: data.uri,
+        url: data.external_urls.spotify,
+        followers: data.followers.total,
+        popularity: data.popularity,
+        images: data.images,
+      }
     }
     if (par === "track") {
-      const result = await client.tracks.search(other);
-      if (!result.items[0]) return { error: "Track not found!" };
-      const { id, name, externalUrls, duration, uri, popularity, previewUrl } =
-        result.items[0];
+      const data = await search(par, other);
+      if (!data) return { error: "Track not found!" };
 
-      let found = true;
-      const album_data = await client.albums
-        .search(other)
-        .then((alb) => alb.items[0]);
-      let album;
-      if (!album_data) {
-        album = {
-          found: false,
-        };
-      } else
-        album = {
-          found,
-          id: album_data.id,
-          name: album_data.name,
-          url: album_data.externalUrls.spotify,
-          uri: album_data.uri,
-          releaseDate: album_data.releaseDate,
-          images: album_data.images,
-        };
+      let artists = [[], []]
+      data.artists.forEach(artist => {
+        artists[0].push({
+          id: artist.id,
+          name: artist.name,
+          uri: artist.uri,
+          url: artist.external_urls.spotify
+        })
+      })
+      data.album.artists.forEach(artist => {
+        artists[1].push({
+          id: artist.id,
+          name: artist.name,
+          uri: artist.uri,
+          url: artist.external_urls.spotify
+        })
+      })
 
       return {
-        id,
-        name,
-        url: externalUrls.spotify,
-        uri,
-        preview: previewUrl,
-        duration,
-        popularity,
-        album,
-      };
+        id: data.id,
+        name: data.name,
+        uri: data.uri,
+        url: data.external_urls.spotify,
+        duration: data.duration_ms,
+        preview: data.preview_url,
+        popularity: data.popularity,
+        artists: artists[0],
+        album: {
+          id: data.album.id,
+          name: data.album.name,
+          uri: data.album.uri,
+          url: data.album.external_urls.spotify,
+          release_date: data.album.release_date,
+          images: data.album.images,
+          artists: artists[1],
+        },
+      }
     }
     if (par === "album") {
-      const result = await client.albums.search(other);
-      if (!result.items[0]) return { error: "Album not found!" };
+      const data = await search(par, other);
+      if (!data) return { error: "Album not found!" };
 
-      let tracks = [];
-
-      await client.albums.getTracks(result.items[0].id).then((tr) => {
-        tr.items.forEach(async (track) => {
-          const {
-            id,
-            name,
-            externalUrls,
-            duration,
-            uri,
-            popularity,
-            previewUrl,
-          } = track;
-
-          tracks.push({
-            id,
-            name,
-            url: externalUrls.spotify,
-            uri,
-            preview: previewUrl,
-            duration,
-            popularity,
-          });
-        });
-      });
-
-      const {
-        id,
-        name,
-        externalUrls,
-        duration,
-        uri,
-        releaseDate,
-        totalTracks,
-        images,
-      } = result.items[0];
+      let artists = []
+      data.artists.forEach(artist => {
+        artists.push({
+          id: artist.id,
+          name: artist.name,
+          uri: artist.uri,
+          url: artist.external_urls.spotify
+        })
+      })
 
       return {
-        id,
-        name,
-        url: externalUrls.spotify,
-        uri,
-        duration,
-        releaseDate,
-        totalTracks,
-        images,
-        tracks,
-      };
+        id: data.id,
+        name: data.name,
+        uri: data.uri,
+        url: data.external_urls.spotify,
+        release_date: data.release_date,
+        total_tracks: data.total_tracks,
+        images: data.images,
+        artists: artists,
+      }
     }
   },
 };
+
+async function search(type, query) {
+  const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}`, {
+    "Content-Type": "application/json",
+    headers: {
+      "Authorization": `Bearer ${process.env.SPOTIFY_TOKEN}`
+    }
+  }).then(resp => resp.json())
+
+  return resp[type + "s"].items[0]
+}
