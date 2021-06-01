@@ -37,7 +37,6 @@ module.exports = {
             preview: previewUrl,
             duration,
             popularity,
-            link: `http://api.xaliks.xyz/info/spotify/track/${name}`,
           });
         });
       });
@@ -81,12 +80,12 @@ module.exports = {
       } else
         album = {
           found,
-          id: album.id,
-          name: album.name,
-          url: album.externalUrls.spotify,
-          uri: album.uri,
-          releaseDate: album.releaseDate,
-          images: album.images,
+          id: album_data.id,
+          name: album_data.name,
+          url: album_data.externalUrls.spotify,
+          uri: album_data.uri,
+          releaseDate: album_data.releaseDate,
+          images: album_data.images,
         };
 
       return {
@@ -126,7 +125,6 @@ module.exports = {
             preview: previewUrl,
             duration,
             popularity,
-            link: `http://api.xaliks.xyz/info/spotify/track/${name}`,
           });
         });
       });
