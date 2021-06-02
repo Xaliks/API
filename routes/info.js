@@ -13,7 +13,7 @@ module.exports = (app, check) => {
     });
   });
 
-  app.get("/info/:name/:par", (req, resp) => {
+  app.get("/info/:name/:type", (req, resp) => {
     if (!check("info", req.params.name))
       return resp.send({
         error: "Not Found!",
@@ -27,17 +27,20 @@ module.exports = (app, check) => {
     });
   });
 
-  app.get("/info/:name/:par/:other", async (req, resp) => {
+  app.get("/info/:name/:type/:other", async (req, resp) => {
     if (!check("info", req.params.name))
       return resp.send({
         error: "Not Found!",
       });
 
     const data = await require(`../pages/info/${req.params.name}`).run(
-      req.params.par,
+      req.params.type,
       req.params.other
     );
+    const { types } = await require(`../pages/info/${req.params.name}`);
 
+    if (!types.includes(req.params.type.toString()))
+      return resp.send({ error: "Invalid type!" });
     if (data.error) return resp.send(data);
 
     resp.send(data);

@@ -5,13 +5,10 @@ const {
 } = require("../../config.json");
 
 module.exports = {
-  name: "spotify",
+  types: ["artist", "track", "album"],
   firstEndpoints: ["/artist/:name", "/track/:name", "/album/:name"],
   secondEndpoints: ["ARTIST: /:name", "TRACK: /:name", "ALBUM: /:name"],
   async run(type, other) {
-    if (!["artist", "track", "album"].includes(type.toString()))
-      return { error: "Invalid type!" };
-
     const data = await search(type, other);
     if (!data)
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };

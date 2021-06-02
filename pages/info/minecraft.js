@@ -1,13 +1,10 @@
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "minecraft",
+  types: ["player", "server"],
   firstEndpoints: ["/player/:nickname", "/server/:server_ip"],
   secondEndpoints: ["PLAYER: /:nickname", "SERVER: /:server_ip"],
   async run(type, other) {
-    if (!["player", "server"].includes(type.toString()))
-      return { error: "Invalid type!" };
-
     if (type === "player") {
       const username = encodeURIComponent(other);
       const data = await fetch(
