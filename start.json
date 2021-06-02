@@ -8,6 +8,7 @@
     "/info/spotify/artist/:name",
 
     "/random/cat",
+    "/random/dog",
     "/random/wyr"
   ],
   "links": [
@@ -20,6 +21,8 @@
     "https://aws.random.cat/",
     "https://some-random-api.ml/",
     "https://shibe.online/",
+    "https://dog.ceo/",
+    "https://random.dog/",
 
     "https://api.mcsrvstat.us/",
     "https://mcapi.xdefcon.com/",

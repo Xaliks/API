@@ -123,6 +123,6 @@ async function getApiToken(clientID, clientSecret) {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
-  
+
   return data.access_token;
 }
