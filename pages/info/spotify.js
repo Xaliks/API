@@ -8,11 +8,15 @@ module.exports = {
   name: "spotify",
   firstEndpoints: ["/artist/:name", "/track/:name", "/album/:name"],
   secondEndpoints: ["ARTIST: /:name", "TRACK: /:name", "ALBUM: /:name"],
-  async run(par, other) {
-    if (par === "artist") {
-      const data = await search("artist", other);
-      if (!data) return { error: "Artist not found!" };
+  async run(type, other) {
+    if (!["artist", "track", "album"].includes(type.toString()))
+      return { error: "Invalid type!" };
 
+    const data = await search(type, other);
+    if (!data)
+      return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
+
+    if (type === "artist") {
       let top10tracks = [await getTop10ArtistTracks(data.id), []];
       top10tracks[0].forEach((track) => {
         top10tracks[1].push({
@@ -39,9 +43,6 @@ module.exports = {
       };
     }
     if (par === "track") {
-      const data = await search(par, other);
-      if (!data) return { error: "Track not found!" };
-
       let artists = [[], []];
       data.artists.forEach((artist) => {
         artists[0].push({
@@ -81,9 +82,6 @@ module.exports = {
       };
     }
     if (par === "album") {
-      const data = await search(par, other);
-      if (!data) return { error: "Album not found!" };
-
       let artists = [];
       data.artists.forEach((artist) => {
         artists.push({

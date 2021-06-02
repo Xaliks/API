@@ -4,8 +4,11 @@ module.exports = {
   name: "minecraft",
   firstEndpoints: ["/player/:nickname", "/server/:server_ip"],
   secondEndpoints: ["PLAYER: /:nickname", "SERVER: /:server_ip"],
-  async run(par, other) {
-    if (par === "player") {
+  async run(type, other) {
+    if (!["player", "server"].includes(type.toString()))
+      return { error: "Invalid type!" };
+
+    if (type === "player") {
       const username = encodeURIComponent(other);
       const data = await fetch(
         `https://some-random-api.ml/mc?username=${username}`
@@ -31,7 +34,7 @@ module.exports = {
         },
       };
     }
-    if (par === "server") {
+    if (type === "server") {
       const server_ip = encodeURIComponent(other);
       const data = await fetch(`https://api.mcsrvstat.us/2/${server_ip}`).then(
         (resp) => resp.json()
