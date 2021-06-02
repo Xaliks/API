@@ -1,4 +1,8 @@
 const fetch = require("node-fetch");
+const {
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_CLIENT_SECRET,
+} = require("../../config.json");
 
 module.exports = {
   name: "spotify",
@@ -17,29 +21,29 @@ module.exports = {
         followers: data.followers.total,
         popularity: data.popularity,
         images: data.images,
-      }
+      };
     }
     if (par === "track") {
       const data = await search(par, other);
       if (!data) return { error: "Track not found!" };
 
-      let artists = [[], []]
-      data.artists.forEach(artist => {
+      let artists = [[], []];
+      data.artists.forEach((artist) => {
         artists[0].push({
           id: artist.id,
           name: artist.name,
           uri: artist.uri,
-          url: artist.external_urls.spotify
-        })
-      })
-      data.album.artists.forEach(artist => {
+          url: artist.external_urls.spotify,
+        });
+      });
+      data.album.artists.forEach((artist) => {
         artists[1].push({
           id: artist.id,
           name: artist.name,
           uri: artist.uri,
-          url: artist.external_urls.spotify
-        })
-      })
+          url: artist.external_urls.spotify,
+        });
+      });
 
       return {
         id: data.id,
@@ -59,21 +63,21 @@ module.exports = {
           images: data.album.images,
           artists: artists[1],
         },
-      }
+      };
     }
     if (par === "album") {
       const data = await search(par, other);
       if (!data) return { error: "Album not found!" };
 
-      let artists = []
-      data.artists.forEach(artist => {
+      let artists = [];
+      data.artists.forEach((artist) => {
         artists.push({
           id: artist.id,
           name: artist.name,
           uri: artist.uri,
-          url: artist.external_urls.spotify
-        })
-      })
+          url: artist.external_urls.spotify,
+        });
+      });
 
       return {
         id: data.id,
@@ -84,18 +88,41 @@ module.exports = {
         total_tracks: data.total_tracks,
         images: data.images,
         artists: artists,
-      }
+      };
     }
   },
 };
 
 async function search(type, query) {
-  const resp = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}`, {
-    "Content-Type": "application/json",
-    headers: {
-      "Authorization": `Bearer ${process.env.SPOTIFY_TOKEN}`
+  const token = await getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
+  const resp = await fetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+      query
+    )}&type=${type}`,
+    {
+      "Content-Type": "application/json",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  }).then(resp => resp.json())
+  ).then((resp) => resp.json());
 
-  return resp[type + "s"].items[0]
+  return resp[type + "s"].items[0];
+}
+async function getApiToken(clientID, clientSecret) {
+  const { data } = await require("axios").default({
+    method: "POST",
+    url: "https://accounts.spotify.com/api/token",
+    params: {
+      grant_type: "client_credentials",
+      token: "NO_TOKEN",
+      client_id: clientID,
+      client_secret: clientSecret,
+    },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+  
+  return data.access_token;
 }
