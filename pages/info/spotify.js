@@ -6,10 +6,8 @@ const {
 
 module.exports = {
   types: ["artist", "track", "album", "playlist"],
-  firstEndpoints: ["/artist/:name", "/track/:name", "/album/:name"],
-  secondEndpoints: ["ARTIST: /:name", "TRACK: /:name", "ALBUM: /:name"],
-  async run(type, other) {
-    const data = await search(type, other);
+  async run(type, query) {
+    const data = await search(type, query);
     if (!data && type != "playlist")
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
 
@@ -115,7 +113,7 @@ module.exports = {
       };
     }
     if (type === "playlist") {
-      const playlist = await getPlaylist(other);
+      const playlist = await getPlaylist(query);
       if (!playlist) return { error: "Playlist not found!" };
 
       let tracks = [];
@@ -177,8 +175,8 @@ module.exports = {
           name: owner.display_name,
           uri: owner.uri,
           url: owner.external_urls.spotify,
-          images: owner.images,
           followers: owner.followers.total,
+          images: owner.images,
         },
         images: playlist.images,
         total_tracks: playlist.tracks.total,
@@ -188,8 +186,6 @@ module.exports = {
   },
 };
 
-const token = getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
-
 async function search(type, query) {
   const resp = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
@@ -198,7 +194,10 @@ async function search(type, query) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${await token}`,
+        Authorization: `Bearer ${await getApiToken(
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        )}`,
       },
     }
   ).then((resp) => resp.json());
@@ -213,7 +212,10 @@ async function getPlaylist(playlistId) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${await token}`,
+        Authorization: `Bearer ${await getApiToken(
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        )}`,
       },
     }
   ).then((resp) => resp.json());
@@ -228,7 +230,10 @@ async function getUser(userId) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${await token}`,
+        Authorization: `Bearer ${await getApiToken(
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        )}`,
       },
     }
   ).then((resp) => resp.json());
@@ -243,7 +248,10 @@ async function getTop10ArtistTracks(artistId) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${await token}`,
+        Authorization: `Bearer ${await getApiToken(
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        )}`,
       },
     }
   ).then((resp) => resp.json());
@@ -256,7 +264,10 @@ async function getAlbumTracks(albumId) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${await token}`,
+        Authorization: `Bearer ${await getApiToken(
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        )}`,
       },
     }
   ).then((resp) => resp.json());

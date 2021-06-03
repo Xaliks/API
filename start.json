@@ -1,11 +1,8 @@
 {
   "Author": "Xaliks#5991",
   "endpoints": [
-    "/info/minecraft/player/:nickname",
-    "/info/minecraft/server/:server_ip",
-    "/info/spotify/track/:name",
-    "/info/spotify/album/:name",
-    "/info/spotify/artist/:name",
+    "/info/minecraft/",
+    "/info/spotify/",
 
     "/random/cat",
     "/random/dog",

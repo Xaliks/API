@@ -1,11 +1,11 @@
 module.exports = (app, check) => {
-  app.get("/random/:query", async (req, resp) => {
-    if (!check("random", req.params.query))
+  app.get("/random/:name", async (req, resp) => {
+    if (!check("random", req.params.name))
       return resp.send({
         error: "Not Found!",
       });
 
-    const data = await require(`../pages/random/${req.params.query}`).run(
+    const data = await require(`../pages/random/${req.params.name}`).run(
       random
     );
 

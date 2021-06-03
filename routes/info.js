@@ -1,46 +1,35 @@
 module.exports = (app, check) => {
-  app.get("/info/:name", (req, resp) => {
+  app.get("/info/:name", async (req, resp) => {
     if (!check("info", req.params.name))
       return resp.send({
         error: "Not Found!",
       });
 
-    const endpoints =
-      require(`../pages/info/${req.params.name}`).firstEndpoints;
+    const errors = [];
 
-    resp.send({
-      endpoints,
-    });
-  });
-
-  app.get("/info/:name/:type", (req, resp) => {
-    if (!check("info", req.params.name))
+    if (!req.query.type) {
+      errors.push("Missing type queries");
+    }
+    if (!req.query.query) {
+      errors.push("Missing query queries");
+    }
+    if (errors[0]) {
       return resp.send({
-        error: "Not Found!",
+        errors,
+        "Example:": "/spotify?type=track&query=Амома",
       });
+    }
 
-    const endpoints =
-      require(`../pages/info/${req.params.name}`).secondEndpoints;
-
-    resp.send({
-      endpoints,
-    });
-  });
-
-  app.get("/info/:name/:type/:other", async (req, resp) => {
-    if (!check("info", req.params.name))
+    const types = require(`../pages/info/${req.params.name}`).types;
+    if (!types.includes(req.query.type.toString()))
       return resp.send({
-        error: "Not Found!",
+        error: `Invalid type! Available types: < ${types.join(" / ")} >`,
       });
 
     const data = await require(`../pages/info/${req.params.name}`).run(
-      req.params.type,
-      req.params.other
+      req.query.type,
+      req.query.query
     );
-    const { types } = await require(`../pages/info/${req.params.name}`);
-
-    if (!types.includes(req.params.type.toString()))
-      return resp.send({ error: "Invalid type!" });
     if (data.error) return resp.send(data);
 
     resp.send(data);

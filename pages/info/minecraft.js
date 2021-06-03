@@ -2,11 +2,9 @@ const fetch = require("node-fetch");
 
 module.exports = {
   types: ["player", "server"],
-  firstEndpoints: ["/player/:nickname", "/server/:server_ip"],
-  secondEndpoints: ["PLAYER: /:nickname", "SERVER: /:server_ip"],
-  async run(type, other) {
+  async run(type, query) {
     if (type === "player") {
-      const username = encodeURIComponent(other);
+      const username = encodeURIComponent(query);
       const data = await fetch(
         `https://some-random-api.ml/mc?username=${username}`
       ).then((resp) => resp.json());
@@ -32,7 +30,7 @@ module.exports = {
       };
     }
     if (type === "server") {
-      const server_ip = encodeURIComponent(other);
+      const server_ip = encodeURIComponent(query);
       const data = await fetch(`https://api.mcsrvstat.us/2/${server_ip}`).then(
         (resp) => resp.json()
       );
