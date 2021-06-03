@@ -5,12 +5,12 @@ const {
 } = require("../../config.json");
 
 module.exports = {
-  types: ["artist", "track", "album"],
+  types: ["artist", "track", "album", "playlist"],
   firstEndpoints: ["/artist/:name", "/track/:name", "/album/:name"],
   secondEndpoints: ["ARTIST: /:name", "TRACK: /:name", "ALBUM: /:name"],
   async run(type, other) {
     const data = await search(type, other);
-    if (!data)
+    if (!data && type != "playlist")
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
 
     if (type === "artist") {
@@ -39,7 +39,7 @@ module.exports = {
         top10tracks: top10tracks[1],
       };
     }
-    if (par === "track") {
+    if (type === "track") {
       let artists = [[], []];
       data.artists.forEach((artist) => {
         artists[0].push({
@@ -78,7 +78,7 @@ module.exports = {
         },
       };
     }
-    if (par === "album") {
+    if (type === "album") {
       let artists = [];
       data.artists.forEach((artist) => {
         artists.push({
@@ -114,11 +114,83 @@ module.exports = {
         tracks: tracks[1],
       };
     }
+    if (type === "playlist") {
+      const playlist = await getPlaylist(other);
+      if (!playlist) return { error: "Playlist not found!" };
+
+      let tracks = [];
+      playlist.tracks.items.forEach((track) => {
+        let artists = [[], []];
+        track = track.track;
+
+        track.artists.forEach((artist) => {
+          artists[0].push({
+            id: artist.id,
+            name: artist.name,
+            uri: artist.uri,
+            url: artist.external_urls.spotify,
+          });
+        });
+        track.album.artists.forEach((artist) => {
+          artists[1].push({
+            id: artist.id,
+            name: artist.name,
+            uri: artist.uri,
+            url: artist.external_urls.spotify,
+          });
+        });
+
+        tracks.push({
+          id: track.id,
+          name: track.name,
+          uri: track.uri,
+          url: track.external_urls.spotify,
+          duration: track.duration_ms,
+          preview: track.preview_url,
+          popularity: track.popularity,
+          artists: artists[0],
+          album: {
+            id: track.album.id,
+            name: track.album.name,
+            uri: track.album.uri,
+            url: track.album.external_urls.spotify,
+            release_date: track.album.release_date,
+            images: track.album.images,
+            artists: artists[1],
+          },
+        });
+      });
+
+      const owner = await getUser(playlist.owner.id);
+
+      return {
+        id: playlist.id,
+        name: playlist.name,
+        uri: playlist.uri,
+        url: playlist.external_urls.spotify,
+        description: playlist.description,
+        public: playlist.public,
+        collaborative: playlist.collaborative,
+        followers: playlist.followers.total,
+        owner: {
+          id: owner.id,
+          name: owner.display_name,
+          uri: owner.uri,
+          url: owner.external_urls.spotify,
+          images: owner.images,
+          followers: owner.followers.total,
+        },
+        images: playlist.images,
+        total_tracks: playlist.tracks.total,
+        tracks: tracks,
+      };
+    }
   },
 };
 
+const token = getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
+
 async function search(type, query) {
-  const token = await getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
   const resp = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
       query
@@ -126,21 +198,52 @@ async function search(type, query) {
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${await token}`,
       },
     }
   ).then((resp) => resp.json());
 
   return resp[type + "s"].items[0];
 }
+async function getPlaylist(playlistId) {
+  const resp = await fetch(
+    `https://api.spotify.com/v1/playlists/${encodeURIComponent(
+      playlistId.toString()
+    )}`,
+    {
+      "Content-Type": "application/json",
+      headers: {
+        Authorization: `Bearer ${await token}`,
+      },
+    }
+  ).then((resp) => resp.json());
+
+  if (resp.error) return undefined;
+
+  return resp;
+}
+async function getUser(userId) {
+  const resp = await fetch(
+    `https://api.spotify.com/v1/users/${encodeURIComponent(userId)}`,
+    {
+      "Content-Type": "application/json",
+      headers: {
+        Authorization: `Bearer ${await token}`,
+      },
+    }
+  ).then((resp) => resp.json());
+
+  if (resp.error) return undefined;
+
+  return resp;
+}
 async function getTop10ArtistTracks(artistId) {
-  const token = await getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
   const resp = await fetch(
     `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`,
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${await token}`,
       },
     }
   ).then((resp) => resp.json());
@@ -148,13 +251,12 @@ async function getTop10ArtistTracks(artistId) {
   return resp.tracks;
 }
 async function getAlbumTracks(albumId) {
-  const token = await getApiToken(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET);
   const resp = await fetch(
     `https://api.spotify.com/v1/albums/${albumId}/tracks`,
     {
       "Content-Type": "application/json",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${await token}`,
       },
     }
   ).then((resp) => resp.json());
