@@ -1,8 +1,3 @@
-const {
-  SPOTIFY_CLIENT_ID,
-  SPOTIFY_CLIENT_SECRET,
-} = require("../../config.json");
-
 module.exports = {
   types: ["artist", "track", "album", "playlist"],
   async run(type, query) {
@@ -122,11 +117,8 @@ module.exports = {
       };
     }
     if (type === "playlist") {
-      const playlist = await getPlaylist(data.id);
-      if (!playlist) return { error: "Playlist not found!" };
-
       let tracks = [];
-      playlist.tracks.items.forEach((track) => {
+      data.tracks.items.forEach((track) => {
         let artists = [[], []];
         track = track.track;
 
@@ -168,19 +160,17 @@ module.exports = {
         });
       });
 
-      const owner = await fetch(
-        `https://api.spotify.com/v1/users/${playlist.owner.id}`
-      );
+      const owner = await get("user", data.owner.id);
 
       return {
-        id: playlist.id,
-        name: playlist.name,
-        uri: playlist.uri,
-        url: playlist.external_urls.spotify,
-        description: playlist.description,
-        public: playlist.public,
-        collaborative: playlist.collaborative,
-        followers: playlist.followers.total,
+        id: data.id,
+        name: data.name,
+        uri: data.uri,
+        url: data.external_urls.spotify,
+        description: data.description,
+        public: data.public,
+        collaborative: data.collaborative,
+        followers: data.followers.total,
         owner: {
           id: owner.id,
           name: owner.display_name,
@@ -189,33 +179,33 @@ module.exports = {
           followers: owner.followers.total,
           images: owner.images,
         },
-        images: playlist.images,
-        total_tracks: playlist.tracks.total,
+        images: data.images,
+        total_tracks: data.tracks.total,
         tracks: tracks,
       };
     }
   },
 };
+
 async function fetch(URL) {
   return require("node-fetch")(URL, {
     "Content-Type": "application/json",
     headers: {
-      Authorization: `Bearer ${await getApiToken(
-        SPOTIFY_CLIENT_ID,
-        SPOTIFY_CLIENT_SECRET
-      )}`,
+      Authorization: `Bearer ${await getApiToken()}`,
     },
   }).then((resp) => resp.json());
 }
-async function getApiToken(clientID, clientSecret) {
+async function getApiToken() {
+  const config = require("../../config.json");
+
   const { data } = await require("axios").default({
     method: "POST",
     url: "https://accounts.spotify.com/api/token",
     params: {
       grant_type: "client_credentials",
       token: "NO_TOKEN",
-      client_id: clientID,
-      client_secret: clientSecret,
+      client_id: config.SPOTIFY_CLIENT_ID,
+      client_secret: config.SPOTIFY_CLIENT_SECRET,
     },
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -251,13 +241,4 @@ async function get(type, id) {
 
     return URI;
   }
-}
-async function getPlaylist(playlistId) {
-  const resp = await fetch(
-    `https://api.spotify.com/v1/playlists/${playlistId.toString()}`
-  );
-
-  if (resp.error) return undefined;
-
-  return resp;
 }
