@@ -12,7 +12,9 @@
     "add": "npm run format && git add -A && git status"
   },
   "version": "1.0.0",
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^2.3.1"
+  },
   "keywords": [],
   "author": "Xaliks",
   "license": "ISC",
