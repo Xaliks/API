@@ -6,7 +6,7 @@ const {
 module.exports = {
   types: ["artist", "track", "album", "playlist"],
   async run(type, query) {
-    const data = await search(type, query);
+    const data = (await get(type, query)) || (await search(type, query));
     if (!data)
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
 
@@ -196,7 +196,6 @@ module.exports = {
     }
   },
 };
-
 async function fetch(URL) {
   return require("node-fetch")(URL, {
     "Content-Type": "application/json",
@@ -234,7 +233,25 @@ async function search(type, query) {
 
   return resp[type + "s"].items[0];
 }
+async function get(type, id) {
+  const resp = await fetch(
+    `https://api.spotify.com/v1/${type + "s"}/${encodeURIComponent(
+      getIDbyURI(id)
+    )}`
+  );
 
+  if (resp.error) return undefined;
+
+  return resp;
+
+  function getIDbyURI(URI) {
+    if (URI.startsWith("https://open.spotify.com/"))
+      return URI.split("/")[4].split("?")[0];
+    if (URI.split(":").length === 3) return URI.split(":")[2];
+
+    return URI;
+  }
+}
 async function getPlaylist(playlistId) {
   const resp = await fetch(
     `https://api.spotify.com/v1/playlists/${playlistId.toString()}`

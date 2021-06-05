@@ -8,7 +8,8 @@
     "node-fetch": "^2.6.1"
   },
   "scripts": {
-    "add": "prettier --write \"**/*.{js,json}\" && git add -A && git status"
+    "format": "prettier --write \"**/*.{js,json}\"",
+    "add": "npm run format && git add -A && git status"
   },
   "version": "1.0.0",
   "devDependencies": {},
