@@ -1,6 +1,8 @@
 module.exports = {
   types: ["artist", "track", "album", "playlist"],
-  async run(type, query) {
+  async run(queries) {
+    const { type, query } = queries;
+
     const data = (await get(type, query)) || (await search(type, query));
     if (!data)
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };

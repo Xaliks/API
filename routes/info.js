@@ -21,14 +21,13 @@ module.exports = (app, check) => {
     }
 
     const types = require(`../pages/info/${req.params.name}`).types;
-    if (!types.includes(req.query.type.toString()))
+    if (!types.includes(req.query.type))
       return resp.send({
         error: `Invalid type! Available types: < ${types.join(" / ")} >`,
       });
 
     const data = await require(`../pages/info/${req.params.name}`).run(
-      req.query.type,
-      req.query.query
+      req.query
     );
     if (data.error) return resp.send(data);
 

@@ -1,16 +1,15 @@
-const fetch = require("node-fetch");
-
 module.exports = {
-  types: ["info"],
-  async run(type, token) {
-    if (await getData().then((d) => d.message))
+  types: ["info", "leave_guild"],
+  async run(queries) {
+    const { type, query: token, guildId } = queries;
+    if (await getUserData().then((d) => d.message))
       return { error: "Invalid token!" };
 
     if (type === "info") {
       const data = {};
 
       // general
-      const general = await getData();
+      const general = await getUserData();
       data.tag = general.username + "#" + general.discriminator;
       data.id = general.id;
       data.email = general.email;
@@ -20,8 +19,33 @@ module.exports = {
       data.locale = general.locale;
       data.avatar = `https://cdn.discordapp.com/avatars/${general.id}/${general.avatar}.png`;
 
+      // connections
+      const connections = await getUserData("/connections");
+      data.connections = [];
+      if (connections[0]) {
+        connections.forEach((connection) => {
+          data.connections.push({
+            type: connection.type,
+            name: connection.name,
+            public: connection.visibility === 1 ? true : false,
+            show_activity: connection.show_activity,
+            access_token: connection.access_token || null,
+            integrations: connection.integrations,
+          });
+        });
+      }
+
+      // settings
+      const settings = await getUserData("/settings");
+      data.settings = {};
+      data.settings.status = settings.status;
+      data.settings.locale = settings.locale;
+      data.settings.theme = settings.theme;
+      data.settings.developer_mode = settings.developer_mode;
+      data.settings.timezone_offset = settings.timezone_offset;
+
       // billing
-      const billing = await getData("/billing/payment-sources");
+      const billing = await getUserData("/billing/payment-sources");
       data.payments = [];
       if (billing[0]) {
         billing.forEach((bill) => {
@@ -53,7 +77,7 @@ module.exports = {
       }
 
       // subscriptions(nitro)
-      const subscriptions = await getData("/billing/subscriptions");
+      const subscriptions = await getUserData("/billing/subscriptions");
       data.has_nitro = false;
       data.subscriptions = [];
       if (subscriptions[0]) {
@@ -69,7 +93,7 @@ module.exports = {
       }
 
       // gifts
-      const gifts = await getData("/entitlements/gifts");
+      const gifts = await getUserData("/entitlements/gifts");
       data.gifts = [];
       if (gifts[0]) {
         gifts.forEach((gift) => {
@@ -77,17 +101,8 @@ module.exports = {
         });
       }
 
-      // settings
-      const settings = await getData("/settings");
-      data.settings = {};
-      data.settings.status = settings.status;
-      data.settings.locale = settings.locale;
-      data.settings.theme = settings.theme;
-      data.settings.developer_mode = settings.developer_mode;
-      data.settings.timezone_offset = settings.timezone_offset;
-
       // guilds
-      const guilds = await getData("/guilds");
+      const guilds = await getUserData("/guilds");
       data.own_guilds = [];
       data.not_own_guilds = [];
       if (guilds[0]) {
@@ -117,13 +132,30 @@ module.exports = {
 
       return data;
     }
+    if (type === "leave_guild") {
+      if (!guildId) return { error: "Missing guildId queries" };
 
-    function getData(end = "") {
-      return fetch(`https://discord.com/api/v9/users/@me${end}`, {
-        headers: {
-          Authorization: encodeURIComponent(token),
-        },
-      }).then((resp) => resp.json());
+      const data = await fetch(`/users/@me/guilds/${guildId}`, "DELETE", false);
+      if (data.includes("Unknown Guild")) return { error: "Unknown guild" };
+      if (data.includes("Invalid Guild")) return { error: "Invalid Guild" };
+
+      return { success: true };
+    }
+
+    function getUserData(endpont = "") {
+      return fetch(`/users/@me${endpont}`);
+    }
+
+    function fetch(endpoint, method = "GET", json = true) {
+      return require("node-fetch")(
+        `https://canary.discord.com/api/v9${endpoint}`,
+        {
+          method,
+          headers: {
+            Authorization: encodeURIComponent(token),
+          },
+        }
+      ).then((resp) => (json ? resp.json() : resp.text()));
     }
   },
 };

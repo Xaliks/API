@@ -2,7 +2,8 @@ const fetch = require("node-fetch");
 
 module.exports = {
   types: ["player", "server"],
-  async run(type, query) {
+  async run(queries) {
+    const { type, query } = queries;
     if (type === "player") {
       const username = encodeURIComponent(query);
       const data = await fetch(

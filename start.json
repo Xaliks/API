@@ -1,8 +1,9 @@
 {
-  "Author": "Xaliks#5991",
+  "Author": "Xaliks#0001",
   "endpoints": [
     "/info/minecraft/",
     "/info/spotify/",
+    "/info/discord-token",
 
     "/random/cat",
     "/random/dog",
@@ -24,6 +25,7 @@
     "https://api.mcsrvstat.us/",
     "https://mcapi.xdefcon.com/",
     "https://visage.surgeplay.com/",
+    "https://discord.com/api/v9",
 
     "https://cheerio.js.org",
     "https://expressjs.com/",
