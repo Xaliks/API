@@ -1,5 +1,9 @@
 module.exports = {
   types: ["info", "leave_guild"],
+  examples: [
+    "/discord-token?type=info&query=TOKEN",
+    "/discord-token?type=leave_guild&query=TOKEN&guildId=GUILD_ID",
+  ],
   async run(queries) {
     const { type, query: token, guildId } = queries;
     if (await getUserData().then((d) => d.message))

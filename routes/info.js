@@ -6,6 +6,7 @@ module.exports = (app, check) => {
       });
 
     const errors = [];
+    const examples = require(`../pages/info/${req.params.name}`).examples;
 
     if (!req.query.type) {
       errors.push("Missing type queries");
@@ -16,7 +17,7 @@ module.exports = (app, check) => {
     if (errors[0]) {
       return resp.send({
         errors,
-        "Example:": "/spotify?type=track&query=Амома",
+        examples,
       });
     }
 

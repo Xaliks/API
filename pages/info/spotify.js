@@ -1,5 +1,11 @@
 module.exports = {
   types: ["artist", "track", "album", "playlist"],
+  examples: [
+    "/spotify?type=artist&query=ARTIST",
+    "/spotify?type=track&query=TRACK",
+    "/spotify?type=album&query=ALBUM",
+    "/spotify?type=playlist&query=PLAYLIST",
+  ],
   async run(queries) {
     const { type, query } = queries;
 

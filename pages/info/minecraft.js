@@ -2,8 +2,13 @@ const fetch = require("node-fetch");
 
 module.exports = {
   types: ["player", "server"],
+  examples: [
+    "/minecraft?type=player&query=NICKNAME",
+    "/minecraft?type=server&query=SERVER_IP",
+  ],
   async run(queries) {
     const { type, query } = queries;
+
     if (type === "player") {
       const username = encodeURIComponent(query);
       const data = await fetch(
