@@ -17,7 +17,10 @@ module.exports = {
       data.phone = general.phone;
       data.mfa = general.mfa_enabled;
       data.locale = general.locale;
-      data.avatar = `https://cdn.discordapp.com/avatars/${general.id}/${general.avatar}.png`;
+      data.avatar =
+        general.avatar === null
+          ? null
+          : `https://cdn.discordapp.com/avatars/${general.id}/${general.avatar}.png`;
 
       // connections
       const connections = await getUserData("/connections");
