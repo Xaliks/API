@@ -2,7 +2,6 @@ const cheerio = require("cheerio");
 const fetch = require("node-fetch");
 
 module.exports = {
-  name: "wyr",
   async run() {
     const data = await fetch("http://either.io").then((resp) => resp.text());
     const $ = cheerio.load(data);

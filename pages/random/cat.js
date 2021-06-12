@@ -11,7 +11,6 @@ const links = [
 ];
 
 module.exports = {
-  name: "cat",
   async run(random) {
     const rand = random(0, links.length - 1);
     const data = await fetch(links[rand]).then((resp) => resp.json());

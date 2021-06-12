@@ -7,7 +7,9 @@
 
     "/random/cat",
     "/random/dog",
-    "/random/wyr"
+    "/random/wyr",
+    "/random/word",
+    "/random/joke"
   ],
   "links": [
     "http://either.io",
