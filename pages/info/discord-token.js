@@ -6,7 +6,7 @@ module.exports = {
   ],
   async run(queries) {
     const { type, query: token, guildId } = queries;
-    if (await getUserData().then((d) => d.message))
+    if (await getUserData().then((d) => d.message === "401: Unauthorized"))
       return { error: "Invalid token!" };
 
     if (type === "info") {
@@ -24,7 +24,11 @@ module.exports = {
       data.avatar =
         general.avatar === null
           ? null
-          : `https://cdn.discordapp.com/avatars/${general.id}/${general.avatar}.png`;
+          : `https://cdn.discordapp.com/avatars/${general.id}/${
+              general.avatar.startsWith("a_")
+                ? `${general.avatar}.gif`
+                : `${general.avatar}.png`
+            }`;
 
       // connections
       const connections = await getUserData("/connections");
@@ -111,30 +115,32 @@ module.exports = {
       // guilds
       const guilds = await getUserData("/guilds");
       data.own_guilds = [];
-      data.not_own_guilds = [];
+      data.adm_guilds = [];
+      data.guilds = [];
       if (guilds[0]) {
-        guilds
-          .filter((g) => !g.owner)
-          .forEach((guild) => {
-            if (!guild) return;
-            data.not_own_guilds.push({
-              id: guild.id,
-              name: guild.name,
-              icon: `https://cdn.discordapp.com/avatars/${guild.id}/${guild.icon}.png`,
-              features: guild.features,
-            });
-          });
-        guilds
-          .filter((g) => g.owner)
-          .forEach((guild) => {
-            if (!guild) return;
-            data.own_guilds.push({
-              id: guild.id,
-              name: guild.name,
-              icon: `https://cdn.discordapp.com/avatars/${guild.id}/${guild.icon}.png`,
-              features: guild.features,
-            });
-          });
+        guilds.forEach((guild) => {
+          const guild_data = {
+            id: guild.id,
+            name: guild.name,
+            icon:
+              guild.icon === null
+                ? null
+                : `https://cdn.discordapp.com/icons/${guild.id}/${
+                    guild.icon.startsWith("a_")
+                      ? `${guild.icon}.gif`
+                      : `${guild.icon}.png`
+                  }`,
+            permissions: guild.permissions,
+            features: guild.features,
+          };
+          if (guild.owner) {
+            data.own_guilds.push(guild_data);
+          } else if ((Number(guild.permissions) & (1 << 3)) == 1 << 3) {
+            data.adm_guilds.push(guild_data);
+          } else {
+            data.guilds.push(guild_data);
+          }
+        });
       }
 
       return data;
