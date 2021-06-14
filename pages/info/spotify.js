@@ -8,6 +8,8 @@ module.exports = {
   ],
   async run(queries) {
     const { type, query } = queries;
+    if (!type) return { error: "Missing type queries" };
+    if (!query) return { error: "Missing query queries" };
 
     const data = (await get(type, query)) || (await search(type, query));
     if (!data)

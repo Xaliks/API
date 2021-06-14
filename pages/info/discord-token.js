@@ -1,12 +1,15 @@
 module.exports = {
   types: ["info", "leave_guild"],
   examples: [
-    "/discord-token?type=info&query=TOKEN",
-    "/discord-token?type=leave_guild&query=TOKEN&guildId=GUILD_ID",
+    "/discord-token?type=info&token=TOKEN",
+    "/discord-token?type=leave_guild&token=TOKEN&guildId=GUILD_ID",
   ],
   async run(queries) {
-    const { type, query: token, guildId } = queries;
-    if (await getUserData().then((d) => d.message === "401: Unauthorized"))
+    const { type, token, guildId } = queries;
+    if (!type) return { error: "Missing type queries" };
+    if (!token) return { error: "Missing token queries" };
+
+    if (await getUserData().then((d) => d.message))
       return { error: "Invalid token!" };
 
     if (type === "info") {
@@ -135,7 +138,7 @@ module.exports = {
           };
           if (guild.owner) {
             data.own_guilds.push(guild_data);
-          } else if ((Number(guild.permissions) & (1 << 3)) == 1 << 3) {
+          } else if ((3 & Number(guild.permissions)) == 3) {
             data.adm_guilds.push(guild_data);
           } else {
             data.guilds.push(guild_data);

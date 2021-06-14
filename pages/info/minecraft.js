@@ -8,6 +8,8 @@ module.exports = {
   ],
   async run(queries) {
     const { type, query } = queries;
+    if (!type) return { error: "Missing type queries" };
+    if (!query) return { error: "Missing query queries" };
 
     if (type === "player") {
       const username = encodeURIComponent(query);

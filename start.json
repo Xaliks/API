@@ -12,8 +12,6 @@
     "/random/joke"
   ],
   "links": [
-    "http://either.io",
-
     "https://nekos.life/",
     "https://thatcopy.pw/",
     "https://cataas.com/",
@@ -23,6 +21,12 @@
     "https://shibe.online/",
     "https://dog.ceo/",
     "https://random.dog/",
+
+    "http://either.io",
+    "https://fungenerators.com/random/joke",
+    "https://anekdotov.me/random/",
+    "https://random-word-api.herokuapp.com/word",
+    "https://calculator888.ru/random-generator/sluchaynoye-slovo",
 
     "https://api.mcsrvstat.us/",
     "https://mcapi.xdefcon.com/",

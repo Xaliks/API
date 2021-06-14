@@ -1,6 +1,7 @@
 {
   "name": "api",
   "main": "index.js",
+  "description": "Просто API Xaliks'а",
   "dependencies": {
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.9",
@@ -17,6 +18,5 @@
   },
   "keywords": [],
   "author": "Xaliks",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }
