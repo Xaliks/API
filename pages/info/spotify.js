@@ -208,19 +208,15 @@ async function fetch(URL) {
 async function getApiToken() {
   const config = require("../../config.json");
 
-  const { data } = await require("axios").default({
-    method: "POST",
-    url: "https://accounts.spotify.com/api/token",
-    params: {
-      grant_type: "client_credentials",
-      token: "NO_TOKEN",
-      client_id: config.SPOTIFY_CLIENT_ID,
-      client_secret: config.SPOTIFY_CLIENT_SECRET,
-    },
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
+  const data = await require("node-fetch")(
+    `https://accounts.spotify.com/api/token?grant_type=client_credentials&token=NO_TOKEN&client_id=${config.SPOTIFY_CLIENT_ID}&client_secret=${config.SPOTIFY_CLIENT_SECRET}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  ).then((resp) => resp.json());
 
   return data.access_token;
 }
