@@ -9,14 +9,14 @@ module.exports = {
     if (!type) return { error: "Missing type queries" };
     if (!token) return { error: "Missing token queries" };
 
-    if (await getUserData().then((d) => d.message))
+    if (await fetch("/users/@me").then((d) => d.message))
       return { error: "Invalid token!" };
 
     if (type === "info") {
       const data = {};
 
       // general
-      const general = await getUserData();
+      const general = await fetch("/users/@me");
       data.tag = general.username + "#" + general.discriminator;
       data.id = general.id;
       data.email = general.email;
@@ -34,7 +34,7 @@ module.exports = {
             }`;
 
       // connections
-      const connections = await getUserData("/connections");
+      const connections = await fetch("/users/@me/connections");
       data.connections = [];
       if (connections[0]) {
         connections.forEach((connection) => {
@@ -44,22 +44,24 @@ module.exports = {
             public: connection.visibility === 1 ? true : false,
             show_activity: connection.show_activity,
             access_token: connection.access_token || null,
-            integrations: connection.integrations,
           });
         });
       }
 
       // settings
-      const settings = await getUserData("/settings");
+      const settings = await fetch("/users/@me/settings");
       data.settings = {};
       data.settings.status = settings.status;
-      data.settings.locale = settings.locale;
+      data.settings.custom_status = settings.custom_status
+        ? settings.custom_status.text
+        : null;
       data.settings.theme = settings.theme;
       data.settings.developer_mode = settings.developer_mode;
       data.settings.timezone_offset = settings.timezone_offset;
+      data.settings.contact_sync_enabled = settings.contact_sync_enabled;
 
       // billing
-      const billing = await getUserData("/billing/payment-sources");
+      const billing = await fetch("/users/@me/billing/payment-sources");
       data.payments = [];
       if (billing[0]) {
         billing.forEach((bill) => {
@@ -91,11 +93,30 @@ module.exports = {
       }
 
       // subscriptions(nitro)
-      const subscriptions = await getUserData("/billing/subscriptions");
-      data.has_nitro = false;
+      const subscriptions = await fetch("/users/@me/billing/subscriptions");
+      const subscription_slots = await fetch(
+        "/users/@me/guilds/premium/subscription-slots"
+      );
       data.subscriptions = [];
+      data.subscription_slots = [];
+      if (subscription_slots[0]) {
+        subscription_slots.forEach((slot) => {
+          data.subscription_slots.push({
+            id: slot.id,
+            subscription_id: slot.subscription_id,
+            guild_subscription: slot.premium_guild_subscription
+              ? {
+                  id: slot.premium_guild_subscription.id,
+                  guild_id: slot.premium_guild_subscription.guild_id,
+                  ended: slot.premium_guild_subscription.ended,
+                }
+              : null,
+            canceled: slot.canceled,
+            cooldown_ends_at: slot.cooldown_ends_at,
+          });
+        });
+      }
       if (subscriptions[0]) {
-        data.has_nitro = true;
         subscriptions.forEach((subs) => {
           data.subscriptions.push({
             start: subs.current_period_start,
@@ -107,16 +128,88 @@ module.exports = {
       }
 
       // gifts
-      const gifts = await getUserData("/entitlements/gifts");
-      data.gifts = [];
-      if (gifts[0]) {
-        gifts.forEach((gift) => {
-          data.gifts.push(gift);
+      const gifts = await fetch("/users/@me/entitlements/gifts");
+      data.gifts = gifts;
+
+      // applications
+      const applications = await fetch("/applications");
+      data.applications = [];
+      if (applications[0]) {
+        applications.forEach(async (application) => {
+          data.applications.push({
+            id: application.id,
+            name: application.name,
+            description: application.description,
+            summary: application.summary,
+            icon:
+              application.icon === null
+                ? null
+                : `https://cdn.discordapp.com/app-icons/${application.id}/${application.icon}.png`,
+            hook: application.hook,
+            verify_key: application.verify_key,
+            secret: application.secret,
+            redirect_uris: application.redirect_uris,
+            verification_state: application.verification_state,
+            interactions_endpoint_url: application.interactions_endpoint_url,
+            integration_public: application.integration_public,
+            integration_require_code_grant:
+              application.integration_require_code_grant,
+            owner: {
+              id: application.owner.id,
+              tag:
+                application.owner.username +
+                "#" +
+                application.owner.discriminator,
+              avatar:
+                application.owner.avatar === null
+                  ? null
+                  : `https://cdn.discordapp.com/avatars/${
+                      application.owner.id
+                    }/${
+                      application.owner.avatar.startsWith("a_")
+                        ? `${application.owner.avatar}.gif`
+                        : `${application.owner.avatar}.png`
+                    }`,
+            },
+            bot: application.bot
+              ? {
+                  id: application.bot.id,
+                  tag:
+                    application.bot.username +
+                    "#" +
+                    application.bot.discriminator,
+                  token: application.bot.token,
+                  bot_public: application.bot_public,
+                  bot_require_code_grant: application.bot_require_code_grant,
+                  avatar:
+                    application.bot.avatar === null
+                      ? null
+                      : `https://cdn.discordapp.com/avatars/${application.bot.id}/${application.bot.avatar}.png`,
+                }
+              : null,
+          });
+        });
+      }
+
+      // teams
+      const teams = await fetch("/teams");
+      data.teams = [];
+      if (teams[0]) {
+        teams.forEach((team) => {
+          data.teams.push({
+            id: team.id,
+            name: team.name,
+            owner_id: team.owner_user_id,
+            icon:
+              icon === null
+                ? null
+                : `https://cdn.discordapp.com/team-icons/${team.id}/${team.icon}.png`,
+          });
         });
       }
 
       // guilds
-      const guilds = await getUserData("/guilds");
+      const guilds = await fetch("/users/@me/guilds");
       data.own_guilds = [];
       data.adm_guilds = [];
       data.guilds = [];
@@ -156,10 +249,6 @@ module.exports = {
       if (data.includes("Invalid Guild")) return { error: "Invalid Guild" };
 
       return { success: true };
-    }
-
-    function getUserData(endpont = "") {
-      return fetch(`/users/@me${endpont}`);
     }
 
     function fetch(endpoint, method = "GET", json = true) {
