@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const { stat, writeFileSync } = require("fs");
 
 module.exports = {
   types: ["player", "server"],
@@ -46,15 +47,24 @@ module.exports = {
         `https://mcapi.xdefcon.com/server/${server_ip}/full/json`
       ).then((resp) => resp.json());
       if (
-        data.ip === "127.0.0.1" &&
-        !data2.serverip &&
+        data.ip === "127.0.0.1" ||
+        !data.online ||
         data2.serverStatus === "offline"
       )
         return {
           error: "Server Not Found!",
         };
 
-      if (data2.serverStatus === "online")
+      if (data.online) {
+        let icon = null;
+        if (data2.icon != null) {
+          writeFileSync(
+            `./img/${data.ip}.png`,
+            data2.icon.replace(/^data:image\/png;base64,/, ""),
+            "base64"
+          );
+          icon = `http://api.xaliks.xyz/img/${data.ip}.png`;
+        }
         return {
           status: data2.serverStatus,
           host: data.hostname,
@@ -66,14 +76,21 @@ module.exports = {
             max: data.players.max,
           },
           motd: data2.motd.text,
-          icon: data2.icon,
+          icon,
         };
-      else
+      } else {
+        let icon;
+        stat(`../../img/${data.ip}.png`, (err) => {
+          if (err) icon = null;
+          else icon = `http://api.xaliks.xyz/img/${data.ip}.png`;
+        });
         return {
           status: data2.serverStatus,
           host: data.hostname,
           ip: data.ip,
+          icon,
         };
+      }
     }
   },
 };

@@ -1,8 +1,15 @@
-const { readdirSync } = require("fs");
+const { readdirSync, stat } = require("fs");
+const path = require("path");
 
 module.exports = (app, express) => {
   app.get("/", (req, resp) => {
     resp.send(require("../start.json"));
+  });
+  app.get("/img/:img", async (req, resp) => {
+    stat(`./img/${req.params.img}`, (err) => {
+      if (err) return resp.send({ error: "Image not found" });
+    });
+    resp.sendFile(path.join(__dirname, `../img/${req.params.img}`));
   });
   app.get("/:category", (req, resp) => {
     let r = false;
