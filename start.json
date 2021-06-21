@@ -5,6 +5,8 @@
     "/info/spotify/",
     "/info/discord-token",
 
+    "/util/demotivator",
+
     "/random/cat",
     "/random/dog",
     "/random/wyr",
@@ -35,6 +37,7 @@
 
     "https://cheerio.js.org",
     "https://expressjs.com/",
-    "https://spotify-api.js.org"
+    "https://spotify-api.js.org",
+    "https://www.npmjs.com/package/canvas"
   ]
 }

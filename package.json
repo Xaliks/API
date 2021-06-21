@@ -3,12 +3,13 @@
   "main": "index.js",
   "description": "Просто API Xaliks'а",
   "dependencies": {
+    "canvas": "^2.8.0",
     "cheerio": "^1.0.0-rc.9",
     "express": "^4.17.1",
     "node-fetch": "^2.6.1"
   },
   "scripts": {
-    "format": "prettier --write \"**/*.{js,json}\"",
+    "format": "prettier --write \"**/*.{js,json,yml}\"",
     "add": "npm run format && git add -A && git status"
   },
   "version": "1.0.0",
