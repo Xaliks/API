@@ -17,8 +17,12 @@ module.exports = {
     const bg = await loadImage("./assets/demotivator.png");
     ctx.drawImage(bg, 0, 0);
 
-    const img = await loadImage(image);
-    ctx.drawImage(img, 45, 45, 705, 475);
+    try {
+      const img = await loadImage(image);
+      ctx.drawImage(img, 45, 45, 705, 475);
+    } catch (e) {
+      return { error: "Invalid image" };
+    }
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#FFFFFF";
