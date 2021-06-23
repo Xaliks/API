@@ -28,7 +28,7 @@ module.exports = {
           name: track.name,
           uri: track.uri,
           url: track.external_urls.spotify,
-          duration: track.duration_ms,
+          duration: msToTime(track.duration_ms),
           preview: track.preview_url,
           popularity: track.popularity,
         });
@@ -70,7 +70,7 @@ module.exports = {
         name: data.name,
         uri: data.uri,
         url: data.external_urls.spotify,
-        duration: data.duration_ms,
+        duration: msToTime(data.duration_ms),
         preview: data.preview_url,
         popularity: data.popularity,
         artists: artists[0],
@@ -108,7 +108,7 @@ module.exports = {
           name: track.name,
           uri: track.uri,
           url: track.external_urls.spotify,
-          duration: track.duration_ms,
+          duration: msToTime(track.duration_ms),
           preview: track.preview_url,
           popularity: track.popularity,
         });
@@ -154,7 +154,7 @@ module.exports = {
           name: track.name,
           uri: track.uri,
           url: track.external_urls.spotify,
-          duration: track.duration_ms,
+          duration: msToTime(track.duration_ms),
           preview: track.preview_url,
           popularity: track.popularity,
           artists: artists[0],
@@ -247,4 +247,16 @@ async function get(type, id) {
 
     return URI;
   }
+}
+function msToTime(ms) {
+  const temp = [];
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / 1000 / 60) % 60);
+  const hours = Math.floor((ms / 1000 / 60 / 60) % 24);
+
+  if (hours > 0) temp.push(hours);
+  if (minutes > 0) temp.push(minutes);
+  if (seconds > 0) temp.push(seconds);
+
+  return temp.join(":");
 }
