@@ -1,10 +1,11 @@
 module.exports = {
-  types: ["artist", "track", "album", "playlist"],
+  types: ["artist", "track", "album", "playlist", "user"],
   examples: [
     "/spotify?type=artist&query=ARTIST",
     "/spotify?type=track&query=TRACK",
     "/spotify?type=album&query=ALBUM",
     "/spotify?type=playlist&query=PLAYLIST",
+    "/spotify?type=user&query=USER_ID",
   ],
   async run(queries) {
     const { type, query } = queries;
@@ -16,7 +17,34 @@ module.exports = {
       return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
 
     if (type === "artist") {
-      let top10tracks = [
+      const albums = [
+        await fetch(
+          `https://api.spotify.com/v1/artists/${data.id}/albums`
+        ).then((resp) => resp.items),
+        [],
+      ];
+      albums[0].forEach((album) => {
+        const artists = [];
+        album.artists.forEach((artist) => {
+          artists.push({
+            id: artist.id,
+            name: artist.name,
+            uri: artist.uri,
+            url: artist.external_urls.spotify,
+          });
+        });
+        albums[1].push({
+          id: album.id,
+          name: album.name,
+          uri: album.uri,
+          url: album.external_urls.spotify,
+          release_date: album.release_date,
+          total_tracks: album.total_tracks,
+          images: album.images,
+          artists: artists,
+        });
+      });
+      const top10tracks = [
         await fetch(
           `https://api.spotify.com/v1/artists/${data.id}/top-tracks?market=US`
         ).then((resp) => resp.tracks),
@@ -29,6 +57,7 @@ module.exports = {
           uri: track.uri,
           url: track.external_urls.spotify,
           duration: msToTime(track.duration_ms),
+          duration_ms: track.duration_ms,
           preview: track.preview_url,
           popularity: track.popularity,
         });
@@ -43,6 +72,7 @@ module.exports = {
         followers: data.followers.total,
         popularity: data.popularity,
         images: data.images,
+        albums: albums[1],
         top10tracks: top10tracks[1],
       };
     }
@@ -71,6 +101,7 @@ module.exports = {
         uri: data.uri,
         url: data.external_urls.spotify,
         duration: msToTime(data.duration_ms),
+        duration_ms: track.duration_ms,
         preview: data.preview_url,
         popularity: data.popularity,
         artists: artists[0],
@@ -109,6 +140,7 @@ module.exports = {
           uri: track.uri,
           url: track.external_urls.spotify,
           duration: msToTime(track.duration_ms),
+          duration_ms: track.duration_ms,
           preview: track.preview_url,
           popularity: track.popularity,
         });
@@ -155,6 +187,7 @@ module.exports = {
           uri: track.uri,
           url: track.external_urls.spotify,
           duration: msToTime(track.duration_ms),
+          duration_ms: track.duration_ms,
           preview: track.preview_url,
           popularity: track.popularity,
           artists: artists[0],
@@ -194,6 +227,16 @@ module.exports = {
         tracks: tracks,
       };
     }
+    if (type === "user") {
+      return {
+        id: data.id,
+        name: data.display_name,
+        uri: data.uri,
+        url: data.external_urls.spotify,
+        followers: data.followers.total,
+        images: data.images,
+      };
+    }
   },
 };
 
@@ -226,6 +269,8 @@ async function search(type, query) {
       query
     )}&type=${type}`
   );
+
+  if (resp.error) return undefined;
 
   return resp[type + "s"].items[0];
 }
