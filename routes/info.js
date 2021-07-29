@@ -8,7 +8,7 @@ module.exports = (app, check) => {
     const examples = require(`../pages/info/${req.params.name}`).examples;
     const types = require(`../pages/info/${req.params.name}`).types;
 
-    if (!types.includes(req.query.type))
+    if (types && !types.includes(req.query.type))
       return resp.send({
         error: `Invalid type! Available types: < ${types.join(" / ")} >`,
         examples,

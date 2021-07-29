@@ -4,6 +4,7 @@
     "/info/minecraft/",
     "/info/spotify/",
     "/info/discord-token",
+    "/info/lyrics",
 
     "/util/demotivator",
 
@@ -34,6 +35,7 @@
     "https://mcapi.xdefcon.com/",
     "https://visage.surgeplay.com/",
     "https://discord.com/api/v9",
+    "https://genius.com/",
 
     "https://cheerio.js.org",
     "https://expressjs.com/",

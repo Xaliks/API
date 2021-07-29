@@ -101,7 +101,7 @@ module.exports = {
         uri: data.uri,
         url: data.external_urls.spotify,
         duration: msToTime(data.duration_ms),
-        duration_ms: track.duration_ms,
+        duration_ms: data.duration_ms,
         preview: data.preview_url,
         popularity: data.popularity,
         artists: artists[0],
@@ -223,6 +223,9 @@ module.exports = {
           images: owner.images,
         },
         images: data.images,
+        total_tracks_duration: tracks.reduce(
+          (a, b) => a.duration_ms + b.duration_ms
+        ),
         total_tracks: data.tracks.total,
         tracks: tracks,
       };
@@ -300,8 +303,10 @@ function msToTime(ms) {
   const hours = Math.floor((ms / 1000 / 60 / 60) % 24);
 
   if (hours > 0) temp.push(hours);
-  if (minutes > 0) temp.push(minutes);
-  if (seconds > 0) temp.push(seconds);
+  if (minutes > 0)
+    temp.push(minutes.toString().length === 1 ? "0" + minutes : minutes);
+  if (seconds > 0)
+    temp.push(seconds.toString().length === 1 ? "0" + seconds : seconds);
 
   return temp.join(":");
 }
