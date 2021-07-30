@@ -25,10 +25,10 @@ module.exports = {
       full_title: song.result.full_title,
       header_image_url: song.result.header_image_url,
       url: song.result.url,
-      author: {
-        name: song.result.name,
-        header_image_url: song.result.header_image_url,
-        url: song.result.url,
+      artist: {
+        name: song.result.primary_artist.name,
+        header_image_url: song.result.primary_artist.header_image_url,
+        url: song.result.primary_artist.url,
       },
       lyrics: lyrics ? lyrics : null,
     };
@@ -75,7 +75,7 @@ function getLyrics(data) {
         .toArray()
         .filter((m) => m.attribs && m.attribs.itemprop)[0].attribs.content
     )
-      .lyrics_data.body.html.replace(/<\/?a|p|i|br.*?>/g, "")
+      .lyrics_data.body.html.replace(/<\/?.*?>/gimsu, "")
       .trim();
   }
   return lyrics;
