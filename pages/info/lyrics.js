@@ -1,6 +1,5 @@
 const cheerio = require("cheerio");
 const fetch = require("node-fetch");
-const HttpsProxyAgent = require("https-proxy-agent");
 
 module.exports = {
   examples: ["/lyric?query=SONG"],
@@ -13,11 +12,19 @@ module.exports = {
 
     let lyrics;
     if (song.result.path) {
-      const lyricsData = await fetch("https://genius.com" + song.result.path, {
-        agent: new HttpsProxyAgent("http://51.159.154.37:3128"),
-      }).then((resp) => resp.text());
+      const lyricsData = await fetch(
+        "https://genius.com" + song.result.path
+      ).then((resp) => resp.text());
 
       lyrics = getLyrics(lyricsData);
+    }
+    if (!lyrics) {
+      const data = await fetch(
+        `https://some-random-api.ml/lyrics?title=${encodeURIComponent(query)}`
+      ).then((resp) => resp.json());
+      if (!data || data.error) return;
+
+      lyrics = data.lyrics;
     }
 
     return {
