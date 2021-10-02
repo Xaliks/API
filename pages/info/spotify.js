@@ -210,7 +210,7 @@ module.exports = {
         name: data.name,
         uri: data.uri,
         url: data.external_urls.spotify,
-        description: data.description,
+        description: data.description.replace(/(\<a href=spotify:playlist:.{22}>)|(\<\/a>)/g, ""),
         public: data.public,
         collaborative: data.collaborative,
         followers: data.followers.total,
