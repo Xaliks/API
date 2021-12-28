@@ -1,8 +1,8 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-module.exports = {
-  async run() {
+module.exports = (app) => {
+  app.get("/random/word", async (req, resp) => {
     const word_en = await fetch(
       "https://random-word-api.herokuapp.com/word?number=1"
     )
@@ -14,9 +14,9 @@ module.exports = {
       .then((resp) => resp.text())
       .then((resp) => cheerio.load(resp)("div[class=blok_otvet]").text());
 
-    return {
+    return resp.send({
       en: word_en,
       ru: word_ru,
-    };
-  },
+    });
+  });
 };

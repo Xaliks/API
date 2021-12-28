@@ -7,8 +7,8 @@ const links = [
   "https://random.dog/woof.json", // 3 .url
 ];
 
-module.exports = {
-  async run(random) {
+module.exports = (app) => {
+  app.get("/random/dog", async (req, resp) => {
     const rand = random(0, links.length - 1);
     const data = await fetch(links[rand]).then((resp) => resp.json());
     let image;
@@ -18,8 +18,12 @@ module.exports = {
     if (rand === 2) image = data[0];
     if (rand === 3) image = data.url;
 
-    return {
+    return resp.send({
       image,
-    };
-  },
+    });
+  });
 };
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

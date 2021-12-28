@@ -1,8 +1,8 @@
 const cheerio = require("cheerio");
 const fetch = require("node-fetch");
 
-module.exports = {
-  async run() {
+module.exports = (app) => {
+  app.get("/random/wyr", async (req, resp) => {
     const data = await fetch("http://either.io").then((resp) => resp.text());
     const $ = cheerio.load(data);
 
@@ -21,7 +21,7 @@ module.exports = {
     const author = $("#question-author a").text();
     const tag = $(".tags li a").text();
 
-    return {
+    return resp.send({
       title,
       description,
       author,
@@ -39,6 +39,6 @@ module.exports = {
       ],
       total_votes,
       tag,
-    };
-  },
+    });
+  });
 };

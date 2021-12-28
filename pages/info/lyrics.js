@@ -1,14 +1,18 @@
 const cheerio = require("cheerio");
 const fetch = require("node-fetch");
 
-module.exports = {
-  examples: ["/lyric?query=SONG"],
-  async run(queries) {
-    const { query } = queries;
-    if (!query) return { error: "Missing query queries" };
+module.exports = (app) => {
+  const examples = ["/info/lyrics?query=Rickroll"];
+  const usage = "/info/lyrics?query=String";
+
+  app.get("/info/lyrics", async (req, resp) => {
+    const query = req.query.query;
+    if (!query)
+      return utils.error(resp, "Пропущен параметр 'query'", usage, examples);
 
     const song = await getSong(query);
-    if (!song || song.type != "song") return { error: "Song not found" };
+    if (!song || song.type != "song")
+      return utils.error(resp, "Песня не найдена!", usage, examples);
 
     let lyrics;
     if (song.result.path) {
@@ -27,7 +31,7 @@ module.exports = {
       lyrics = data.lyrics;
     }
 
-    return {
+    return resp.send({
       title: song.result.title,
       full_title: song.result.full_title,
       header_image_url: song.result.header_image_url,
@@ -38,8 +42,8 @@ module.exports = {
         url: song.result.primary_artist.url,
       },
       lyrics: lyrics ? lyrics : null,
-    };
-  },
+    });
+  });
 };
 
 async function getSong(query) {

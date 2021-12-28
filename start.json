@@ -1,12 +1,16 @@
 {
   "Author": "Xaliks#5501",
   "endpoints": [
-    "/info/minecraft/",
-    "/info/spotify/",
-    "/info/discord-token",
+    "/info/minecraft",
+    "/info/spotify",
     "/info/lyrics",
 
-    "/util/demotivator",
+    "/render/demotivator",
+    "/render/achievement",
+    "/render/calling",
+    "/render/captcha",
+    "/render/didyoumean",
+    "/render/drake",
 
     "/random/cat",
     "/random/dog",
@@ -34,7 +38,6 @@
     "https://api.mcsrvstat.us/",
     "https://mcapi.xdefcon.com/",
     "https://visage.surgeplay.com/",
-    "https://discord.com/api/v9",
     "https://genius.com/",
 
     "https://cheerio.js.org",

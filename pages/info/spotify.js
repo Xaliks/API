@@ -1,20 +1,25 @@
-module.exports = {
-  types: ["artist", "track", "album", "playlist", "user"],
-  examples: [
-    "/spotify?type=artist&query=ARTIST",
-    "/spotify?type=track&query=TRACK",
-    "/spotify?type=album&query=ALBUM",
-    "/spotify?type=playlist&query=PLAYLIST",
-    "/spotify?type=user&query=USER_ID",
-  ],
-  async run(queries) {
-    const { type, query } = queries;
-    if (!type) return { error: "Missing type queries" };
-    if (!query) return { error: "Missing query queries" };
+module.exports = (app) => {
+  const examples = [
+    "/info/spotify?type=artist&query=Geoxor",
+    "/info/spotify?type=track&query=Cheese",
+    "/info/spotify?type=album&query=ALBUM",
+    "/info/spotify?type=playlist&query=PLAYLIST",
+    "/info/spotify?type=user&query=USER_ID",
+  ];
+  const usage =
+    "/info/spotify?type=String(artist|track|album|playlist|user)&query=String";
+
+  app.get("/info/spotify", async (req, resp) => {
+    const type = req.query.type;
+    const query = req.query.query;
+
+    if (!type)
+      return utils.error(resp, "Пропущен параметр 'type'", usage, examples);
+    if (!query)
+      return utils.error(resp, "Пропущен параметр 'query'", usage, examples);
 
     const data = (await get(type, query)) || (await search(type, query));
-    if (!data)
-      return { error: `${type[0].toUpperCase() + type.slice(1)} not found!` };
+    if (!data) return utils.error(resp, "Не найдено!", usage, examples);
 
     if (type === "artist") {
       const albums = [
@@ -63,7 +68,7 @@ module.exports = {
         });
       });
 
-      return {
+      return resp.send({
         id: data.id,
         name: data.name,
         uri: data.uri,
@@ -74,7 +79,7 @@ module.exports = {
         images: data.images,
         albums: albums[1],
         top10tracks: top10tracks[1],
-      };
+      });
     }
     if (type === "track") {
       let artists = [[], []];
@@ -95,7 +100,7 @@ module.exports = {
         });
       });
 
-      return {
+      return resp.send({
         id: data.id,
         name: data.name,
         uri: data.uri,
@@ -114,7 +119,7 @@ module.exports = {
           images: data.album.images,
           artists: artists[1],
         },
-      };
+      });
     }
     if (type === "album") {
       let artists = [];
@@ -146,7 +151,7 @@ module.exports = {
         });
       });
 
-      return {
+      return resp.send({
         id: data.id,
         name: data.name,
         uri: data.uri,
@@ -156,7 +161,7 @@ module.exports = {
         images: data.images,
         artists: artists,
         tracks: tracks[1],
-      };
+      });
     }
     if (type === "playlist") {
       let tracks = [];
@@ -205,12 +210,15 @@ module.exports = {
 
       const owner = await get("user", data.owner.id);
 
-      return {
+      return resp.send({
         id: data.id,
         name: data.name,
         uri: data.uri,
         url: data.external_urls.spotify,
-        description: data.description.replace(/(\<a href=spotify:playlist:.{22}>)|(\<\/a>)/g, ""),
+        description: data.description.replace(
+          /(\<a href=spotify:playlist:.{22}>)|(\<\/a>)/g,
+          ""
+        ),
         public: data.public,
         collaborative: data.collaborative,
         followers: data.followers.total,
@@ -228,19 +236,19 @@ module.exports = {
         ),
         total_tracks: data.tracks.total,
         tracks: tracks,
-      };
+      });
     }
     if (type === "user") {
-      return {
+      return resp.send({
         id: data.id,
         name: data.display_name,
         uri: data.uri,
         url: data.external_urls.spotify,
         followers: data.followers.total,
         images: data.images,
-      };
+      });
     }
-  },
+  });
 };
 
 async function fetch(URL) {

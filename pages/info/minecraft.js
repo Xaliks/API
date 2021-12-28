@@ -1,16 +1,20 @@
 const fetch = require("node-fetch");
-const { stat, writeFileSync } = require("fs");
 
-module.exports = {
-  types: ["player", "server"],
-  examples: [
-    "/minecraft?type=player&query=NICKNAME",
-    "/minecraft?type=server&query=SERVER_IP",
-  ],
-  async run(queries) {
-    const { type, query } = queries;
-    if (!type) return { error: "Missing type queries" };
-    if (!query) return { error: "Missing query queries" };
+module.exports = (app) => {
+  const examples = [
+    "/minecraft?type=player&query=Xaliksss",
+    "/minecraft?type=server&query=mc.hypixel.net",
+  ];
+  const usage = "/info/spotify?type=String(player|server)&query=String";
+
+  app.get("/info/minecraft", async (req, resp) => {
+    const type = req.query.type;
+    const query = req.query.query;
+
+    if (!type)
+      return utils.error(resp, "Пропущен параметр 'type'", usage, examples);
+    if (!query)
+      return utils.error(resp, "Пропущен параметр 'query'", usage, examples);
 
     if (type === "player") {
       const username = encodeURIComponent(query);
@@ -18,26 +22,24 @@ module.exports = {
         `https://some-random-api.ml/mc?username=${username}`
       ).then((resp) => resp.json());
       if (data.error)
-        return {
-          error: "Player Not Found!",
-        };
-      const uuid = data.uuid;
+        return utils.error(resp, "Игрок не найден!", usage, examples);
 
-      return {
+      return resp.send({
         username: data.username,
-        uuid,
+        uuid: data.uuid,
         name_history: data.name_history,
         skins: {
-          face: skins("face", uuid),
-          front: skins("front", uuid),
-          front_full: skins("frontfull", uuid),
-          head: skins("head", uuid),
-          bust: skins("bust", uuid),
-          full: skins("full", uuid),
-          skin: skins("skin", uuid),
+          face: skins("face", data.uuid),
+          front: skins("front", data.uuid),
+          front_full: skins("frontfull", data.uuid),
+          head: skins("head", data.uuid),
+          bust: skins("bust", data.uuid),
+          full: skins("full", data.uuid),
+          skin: skins("skin", data.uuid),
         },
-      };
+      });
     }
+
     if (type === "server") {
       const server_ip = encodeURIComponent(query);
       const data = await fetch(`https://api.mcsrvstat.us/2/${server_ip}`).then(
@@ -46,26 +48,11 @@ module.exports = {
       const data2 = await fetch(
         `https://mcapi.xdefcon.com/server/${server_ip}/full/json`
       ).then((resp) => resp.json());
-      if (
-        data.ip === "127.0.0.1" ||
-        !data.online ||
-        data2.serverStatus === "offline"
-      )
-        return {
-          error: "Server Not Found!",
-        };
+      if (data.ip === "127.0.0.1")
+        return utils.error(resp, "Сервер не найден!", usage, examples);
 
       if (data.online) {
-        let icon = null;
-        if (data2.icon != null) {
-          writeFileSync(
-            `./img/${data.ip}.png`,
-            data2.icon.replace(/^data:image\/png;base64,/, ""),
-            "base64"
-          );
-          icon = `http://api.xaliks.xyz/img/${data.ip}.png`;
-        }
-        return {
+        return resp.send({
           status: data2.serverStatus,
           host: data.hostname,
           ip: data.ip,
@@ -76,23 +63,17 @@ module.exports = {
             max: data.players.max,
           },
           motd: data2.motd.text,
-          icon,
-        };
-      } else {
-        let icon;
-        stat(`../../img/${data.ip}.png`, (err) => {
-          if (err) icon = null;
-          else icon = `http://api.xaliks.xyz/img/${data.ip}.png`;
+          icon: data2.icon,
         });
-        return {
+      } else {
+        return resp.send({
           status: data2.serverStatus,
           host: data.hostname,
           ip: data.ip,
-          icon,
-        };
+        });
       }
     }
-  },
+  });
 };
 
 function skins(name, uuid) {

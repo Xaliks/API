@@ -10,10 +10,10 @@ const links = [
   "https://shibe.online/api/cats", // 6 [0]
 ];
 
-module.exports = {
-  async run(random) {
-    const rand = random(0, links.length - 1);
-    const data = await fetch(links[rand]).then((resp) => resp.json());
+module.exports = (app) => {
+  app.get("/random/cat", async (req, resp) => {
+    const rand = random(1, links.length);
+    const data = await fetch(links[rand - 1]).then((resp) => resp.json());
     let image;
 
     if (rand === 0 || rand === 1) image = data.url;
@@ -23,8 +23,12 @@ module.exports = {
     if (rand === 5) image = data.link;
     if (rand === 6) image = data[0];
 
-    return {
+    return resp.send({
       image,
-    };
-  },
+    });
+  });
 };
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

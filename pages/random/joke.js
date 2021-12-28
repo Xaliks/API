@@ -1,8 +1,8 @@
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-module.exports = {
-  async run() {
+module.exports = (app) => {
+  app.get("/random/joke", async (req, resp) => {
     const data_en = await fetch("https://fungenerators.com/random/joke").then(
       (resp) => resp.text()
     );
@@ -30,7 +30,7 @@ module.exports = {
         .text()
         .replace(" Powered by jokes.one Jokes API.", "");
 
-    return {
+    return resp.send({
       en: {
         category: category_en,
         joke: joke_en,
@@ -39,6 +39,6 @@ module.exports = {
         category: category_ru,
         joke: joke_ru,
       },
-    };
-  },
+    });
+  });
 };
