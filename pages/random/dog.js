@@ -1,29 +1,29 @@
 const fetch = require("node-fetch");
 
 const links = [
-  "https://dog.ceo/api/breeds/image/random", // 0 .message
-  "https://some-random-api.ml/img/dog", // 1 .link
-  "http://shibe.online/api/shibes", // 2 [0]
-  "https://random.dog/woof.json", // 3 .url
+	"https://dog.ceo/api/breeds/image/random", // 0 .message
+	"https://some-random-api.ml/img/dog", // 1 .link
+	"http://shibe.online/api/shibes", // 2 [0]
+	"https://random.dog/woof.json", // 3 .url
 ];
 
 module.exports = (app) => {
-  app.get("/random/dog", async (req, resp) => {
-    const rand = random(0, links.length - 1);
-    const data = await fetch(links[rand]).then((resp) => resp.json());
-    let image;
+	app.get("/random/dog", async (req, resp) => {
+		const rand = random(0, links.length - 1);
+		const data = await fetch(links[rand]).then((resp) => resp.json());
+		let image;
 
-    if (rand === 0) image = data.message;
-    if (rand === 1) image = data.link;
-    if (rand === 2) image = data[0];
-    if (rand === 3) image = data.url;
+		if (rand === 0) image = data.message;
+		if (rand === 1) image = data.link;
+		if (rand === 2) image = data[0];
+		if (rand === 3) image = data.url;
 
-    return resp.send({
-      image,
-    });
-  });
+		return resp.send({
+			image,
+		});
+	});
 };
 
 function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
