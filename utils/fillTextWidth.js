@@ -24,5 +24,5 @@ module.exports = (ctx, text, x, y, width) => {
 			ctx.fillText(str, x, y);
 		});
 
-	return true;
+	return y;
 };
