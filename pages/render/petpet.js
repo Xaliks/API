@@ -1,6 +1,7 @@
 const { createCanvas, loadImage } = require("canvas");
 const GIFEncoder = require("gifencoder");
 const path = require("path");
+
 const frames = require("fs").readdirSync("./assets/images/petpet");
 
 module.exports = (app) => {
@@ -38,9 +39,9 @@ module.exports = (app) => {
       const j = i < frames.length / 2 ? i : frames.length - i;
 
       const width = 0.8 + j * 0.02;
-      const height = 0.8 - j * 0.05;
+      const height = 0.7 - j * 0.05;
       const offsetX = (1 - width) * 0.5 + 0.1;
-      const offsetY = 1 - height - 0.08;
+      const offsetY = 1.04 - height - 0.08;
 
       ctx.drawImage(img, canvas.width * offsetX, canvas.height * offsetY, canvas.width * width, canvas.height * height);
       ctx.drawImage(
@@ -55,7 +56,8 @@ module.exports = (app) => {
     }
     encoder.finish();
 
-    resp.setHeader("Content-Type", "image/png");
+    resp.setHeader('Content-Type', 'image/gif');
+    resp.setHeader("Content-length", encoder.out.getData().length);
     return resp.send(encoder.out.getData());
   });
 };
