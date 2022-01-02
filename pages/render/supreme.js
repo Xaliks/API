@@ -2,9 +2,7 @@ const { createCanvas, registerFont } = require("canvas");
 const path = require("path");
 
 module.exports = (app) => {
-  const examples = [
-    "/render/supreme?text=Supreme",
-  ];
+  const examples = ["/render/supreme?text=Supreme"];
   const usage = "/render/supreme?text=String(1-300)";
 
   app.get("/render/supreme", async (req, resp) => {

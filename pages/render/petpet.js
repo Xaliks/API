@@ -56,7 +56,7 @@ module.exports = (app) => {
     }
     encoder.finish();
 
-    resp.setHeader('Content-Type', 'image/gif');
+    resp.setHeader("Content-Type", "image/gif");
     resp.setHeader("Content-length", encoder.out.getData().length);
     return resp.send(encoder.out.getData());
   });
