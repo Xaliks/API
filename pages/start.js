@@ -26,7 +26,7 @@ module.exports = () => {
     .forEach((cat) => {
       endpoints[cat] = [];
       readdirSync(`pages/${cat}`).forEach((endpont) => {
-        endpoints[cat].push("/" + endpont.slice(0, -3));
+        endpoints[cat].push(`/${cat}/${endpont.slice(0, -3)}`);
       });
     });
 
