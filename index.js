@@ -12,14 +12,16 @@ app.use(
 );
 
 app.get("/", (req, resp) => {
-  resp.send(require("./start.json"));
+  resp.send(require("./pages/start")());
 });
 
-readdirSync("pages").forEach((page) => {
-  readdirSync(`pages/${page}`).forEach((file) => {
-    require(`./pages/${page}/${file}`)(app);
+readdirSync("pages")
+  .filter((page) => !page.endsWith(".js"))
+  .forEach((page) => {
+    readdirSync(`pages/${page}`).forEach((file) => {
+      require(`./pages/${page}/${file}`)(app);
+    });
   });
-});
 readdirSync("utils").forEach((file) => {
   global.utils[file.slice(0, -3)] = require(`./utils/${file}`);
 });
