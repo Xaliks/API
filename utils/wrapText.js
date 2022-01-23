@@ -12,7 +12,7 @@ module.exports = (ctx, text, x, y, width = 0) => {
       if (i === 1) ++i;
 
       let text = args.slice(0, i - 1).join(" ");
-      
+
       if (ctx.measureText(text).width > width) {
         let idx = 0;
 
@@ -20,13 +20,13 @@ module.exports = (ctx, text, x, y, width = 0) => {
           if (ctx.measureText(text.slice(0, idx)).width > width) {
             if (idx === 1) ++idx;
 
-            args.splice(i - 1, 0, text.slice(idx))
+            args.splice(i - 1, 0, text.slice(idx));
             text = text.slice(0, idx);
           } else ++idx;
         }
       }
 
-      result.push({ text, y: y + (heigth * currentLine)});
+      result.push({ text, y: y + heigth * currentLine });
 
       ++currentLine;
       args = args.splice(i - 1);
@@ -34,7 +34,7 @@ module.exports = (ctx, text, x, y, width = 0) => {
     } else ++i;
   }
 
-  if (i > 0) result.push({ text: args.join(" "), y: y + (heigth * currentLine)});
+  if (i > 0) result.push({ text: args.join(" "), y: y + heigth * currentLine });
 
   result.forEach((str) => {
     ctx.fillText(str.text, x, str.y);
