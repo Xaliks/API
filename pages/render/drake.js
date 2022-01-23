@@ -25,8 +25,8 @@ module.exports = (app) => {
     ctx.fillStyle = "#000000";
     ctx.font = "23px Verdana";
 
-    utils.fillTextWidth(ctx, top, 245, 27, 244);
-    utils.fillTextWidth(ctx, bottom, 245, 285, 244);
+    utils.wrapText(ctx, top, 245, 27, 244);
+    utils.wrapText(ctx, bottom, 245, 285, 244);
 
     resp.setHeader("Content-Type", "image/png");
     return canvas.pngStream().pipe(resp);

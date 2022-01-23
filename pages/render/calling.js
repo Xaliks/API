@@ -20,7 +20,7 @@ module.exports = (app) => {
 
     ctx.fillStyle = "#000000";
     ctx.font = "27px Verdana";
-    utils.fillTextWidth(ctx, text, 5, 30, 655);
+    utils.wrapText(ctx, text, 5, 30, 655);
 
     resp.setHeader("Content-Type", "image/png");
     return canvas.pngStream().pipe(resp);
