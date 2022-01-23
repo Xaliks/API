@@ -21,9 +21,9 @@ module.exports = (app) => {
     ctx.fillStyle = "#FF0000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.font = "100px Futura Heavy";
+    ctx.font = "105px Futura Heavy";
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(text, 87, 98);
+    ctx.fillText(text, 87, 97);
 
     resp.setHeader("Content-Type", "image/png");
     return canvas.pngStream().pipe(resp);

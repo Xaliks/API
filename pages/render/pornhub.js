@@ -28,11 +28,11 @@ module.exports = (app) => {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText(left, 10, canvas.height / 1.355);
 
-    const w = ctx.measureText(right).width + 20;
+    const w = ctx.measureText(right).width + 25;
     const h = canvas.height - 35;
-    const x = ctx.measureText(left).width + 27;
+    const x = ctx.measureText(left).width + 25;
     const y = canvas.height - 175;
-    const rad = 38;
+    const rad = 25;
 
     ctx.fillStyle = "#f7971e";
     ctx.beginPath();
@@ -47,7 +47,7 @@ module.exports = (app) => {
     ctx.fill();
 
     ctx.fillStyle = "#000000";
-    ctx.fillText(right, ctx.measureText(left).width + 34, canvas.height / 1.355);
+    ctx.fillText(right, ctx.measureText(left).width + 36, canvas.height / 1.355);
 
     resp.setHeader("Content-Type", "image/png");
     return canvas.pngStream().pipe(resp);
