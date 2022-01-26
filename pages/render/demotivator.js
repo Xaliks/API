@@ -60,7 +60,7 @@ module.exports = (app) => {
     ctx.fillStyle = "#FFFFFF";
 
     ctx.font = "65px Times New Roman";
-    const first = utils.wrapText(ctx, top, canvas.width / 2, imageHeight + 100, textLimit);
+    const first = utils.wrapText(ctx, top, canvas.width / 2, imageHeight + 100, textLimit).pop().y;
 
     if (text) {
       ctx.font = "36px Times New Roman";
