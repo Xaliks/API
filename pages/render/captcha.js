@@ -1,6 +1,10 @@
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const path = require("path");
 
+registerFont(path.join(__dirname, "../..", "./assets/fonts/Roboto.ttf"), {
+  family: "Roboto",
+});
+
 module.exports = (app) => {
   const examples = ["/render/captcha?text=Captcha"];
   const usage = "/render/captcha?text=String(1-350)";
@@ -12,9 +16,6 @@ module.exports = (app) => {
     if (text.length > 350) return utils.error(resp, "Параметр 'text' не может содержать в себе больше 350 символов!", usage, examples);
 
     const tmp = createCanvas(0, 189).getContext("2d");
-    registerFont(path.join(__dirname, "../..", "./assets/fonts/Roboto.ttf"), {
-      family: "Roboto",
-    });
     tmp.font = "32px Roboto";
 
     const x = tmp.measureText(text).width + 370;

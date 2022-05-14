@@ -32,10 +32,10 @@ module.exports = (app) => {
       textLimit = canvas.width - 50;
 
       ctx.font = "65px Times New Roman";
-      y = utils.fillTextWidth(ctx, top, 0, 0, textLimit) + ctx.measureText(top).emHeightAscent;
+      y = utils.wrapText(ctx, top, 0, 0, textLimit).pop().y + ctx.measureText(top).emHeightAscent;
       if (text) {
         ctx.font = "36px Times New Roman";
-        y += utils.fillTextWidth(ctx, text, 0, 0, textLimit) + ctx.measureText(top).emHeightAscent;
+        y += utils.wrapText(ctx, text, 0, 0, textLimit).pop().y + ctx.measureText(top).emHeightAscent;
       }
 
       canvas.height = 550 + y;

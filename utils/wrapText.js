@@ -1,4 +1,4 @@
-module.exports = (ctx, text, x, y, width = 0, options = { draw: true }) => {
+module.exports = (ctx, text, x, y, width = 0) => {
   if (width <= 0) return ctx.fillText(text, x, y);
 
   const result = [];
@@ -11,7 +11,7 @@ module.exports = (ctx, text, x, y, width = 0, options = { draw: true }) => {
     if (ctx.measureText(args.slice(0, i).join(" ")).width > width) {
       if (i === 1) ++i;
 
-      let text = args.slice(0, i - 1).join(" ").trim();
+      let text = args.slice(0, i - 1).join(" ").trim();;
 
       if (ctx.measureText(text).width > width) {
         let idx = 0;
@@ -36,7 +36,7 @@ module.exports = (ctx, text, x, y, width = 0, options = { draw: true }) => {
 
   if (i > 0) result.push({ text: args.join(" "), y: y + heigth * currentLine });
 
-  if (options.draw === true) result.forEach((str) => {
+  result.forEach((str) => {
     ctx.fillText(str.text, x, str.y);
   })
 
